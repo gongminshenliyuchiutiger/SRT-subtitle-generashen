@@ -12,6 +12,7 @@ const elements = {
     mascot: document.getElementById('mascot-container'),
     loading: document.getElementById('loading-overlay'),
     statusMsg: document.getElementById('status-msg'),
+    fileNameDisplay: document.getElementById('file-name-display'),
 
     // Tutorial Modal Elements
     helpBtn: document.getElementById('help-btn'),
@@ -89,7 +90,8 @@ function handleFileUpload(e) {
     const url = URL.createObjectURL(file);
     elements.mediaPlayer.src = url;
     elements.generateBtn.disabled = false;
-    elements.statusMsg.innerText = `Loaded: ${file.name}`;
+    elements.fileNameDisplay.innerText = `目前檔案: ${file.name}`;
+    elements.statusMsg.innerText = "已載入";
 }
 
 async function generateSubtitles() {
