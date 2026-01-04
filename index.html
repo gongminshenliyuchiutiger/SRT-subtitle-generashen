@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRT AI 字幕生成系統 (Liyuchiutiger)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Import Map for Gemini SDK -->
+    <script type="importmap">
+    {
+      "imports": {
+        "@google/generative-ai": "https://esm.run/@google/generative-ai"
+      }
+    }
+  </script>
+</head>
+
+<body>
+
+    <header>
+        <h1>SRT AI 字幕生成系統</h1>
+        <p>Upload video/audio, enter key, get subtitles.</p>
+    </header>
+
+    <div class="container">
+
+        <!-- Step 1: Config -->
+        <div class="input-section">
+            <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <input type="password" id="api-key" placeholder="輸入 Gemini API Key (不儲存於伺服器)">
+                <button id="toggle-key" class="file-btn" style="padding: 0.8rem;" title="顯示/隱藏金鑰">
+                    <i class="fa-solid fa-eye"></i>
+                </button>
+                <button id="help-btn" class="file-btn" style="padding: 0.8rem;" title="如何取得 API Key?">
+                    <i class="fa-solid fa-circle-question"></i>
+                </button>
+            </div>
+
+            <div class="file-upload-wrapper">
+                <button class="btn-primary"><i class="fa-solid fa-folder-open"></i> 選擇影片/音檔</button>
+                <input type="file" id="file-upload" accept="video/*,audio/*">
+            </div>
+
+            <button id="generate-btn" class="btn-primary" disabled><i class="fa-solid fa-wand-magic-sparkles"></i>
+                開始生成字幕</button>
+            <button id="download-btn" class="file-btn" disabled><i class="fa-solid fa-download"></i> 下載 SRT</button>
+
+            <span id="status-msg" style="margin-left: 1rem; color: var(--primary-glow);"></span>
+        </div>
+
+        <!-- Step 2: Workspace -->
+        <div class="workspace">
+            <!-- Left: Player -->
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">媒體播放</span>
+                </div>
+                <div class="player-container">
+                    <video id="media-player" controls playsinline>
+                        您的瀏覽器不支援影片播放。
+                    </video>
+                </div>
+                <p style="font-size: 0.8rem; color: #666;">播放時會自動高亮對應字幕。</p>
+            </div>
+
+            <!-- Right: Editor -->
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">字幕編輯</span>
+                </div>
+                <div id="editor-list" class="editor-container">
+                    <!-- Items will be injected here -->
+                    <div style="padding: 2rem; text-align: center; color: #666;">
+                        尚未生成字幕...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        Copyright © Liyuchiutiger Gongminshen
+    </footer>
+
+    <!-- Draggable Mascot -->
+    <div id="mascot-container" title="我是 LiyuChillGuy!">
+        <img src="image/LiyuChillGuy.svg" alt="Mascot">
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading">
+        <div class="spinner"></div>
+        <div style="margin-left: 1rem; color: white; font-weight: bold;">生成中，請稍候...</div>
+    </div>
+
+    <!-- API Key Tutorial Modal -->
+    <div id="tutorial-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>如何取得免費的 Google Gemini API 金鑰？</h2>
+            <p>按照以下簡單步驟，即可取得您自己的免費金鑰：</p>
+            <ol>
+                <li>前往 <a href="https://aistudio.google.com/app/apikey" target="_blank"
+                        style="color: var(--primary-glow);">Google AI Studio 的 API 金鑰頁面</a>。</li>
+                <li>使用您的 Google 帳號登入。</li>
+                <li>點擊頁面上的 「建立 API 金鑰」(Create API key) 按鈕。</li>
+                <li>系統會立即產生一組新的金鑰。點擊金鑰旁邊的複製圖示。</li>
+                <li>回到本頁面，將複製的金鑰貼到輸入框中即可！</li>
+            </ol>
+            <p class="warning">提醒：請妥善保管您的 API 金鑰，不要與他人分享。AI 服務會消耗一定的額度。</p>
+        </div>
+    </div>
+
+    <!-- Module Script -->
+    <script type="module" src="script.js"></script>
+</body>
+
+</html>
