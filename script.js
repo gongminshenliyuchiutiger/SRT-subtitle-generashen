@@ -13,6 +13,18 @@ const elements = {
     loading: document.getElementById('loading-overlay'),
     statusMsg: document.getElementById('status-msg'),
     fileNameDisplay: document.getElementById('file-name-display'),
+    fileNameText: document.getElementById('file-name-text'),
+
+    // Tab Elements
+    tabLocal: document.querySelector('.tab-btn[data-tab="local"]'),
+    tabYoutube: document.querySelector('.tab-btn[data-tab="youtube"]'),
+    contentLocal: document.getElementById('tab-content-local'),
+    contentYoutube: document.getElementById('tab-content-youtube'),
+
+    // YouTube
+    ytInput: document.getElementById('youtube-url'),
+    loadYtBtn: document.getElementById('load-yt-btn'),
+    playerContainer: document.querySelector('.player-container'),
 
     // Tutorial Modal Elements
     helpBtn: document.getElementById('help-btn'),
@@ -24,6 +36,8 @@ const elements = {
 let state = {
     subtitles: [], // { id, start, end, text }
     file: null,
+    youtubeId: null,
+    mode: 'local', // 'local' | 'youtube'
     apiKey: localStorage.getItem('gemini_api_key') || ''
 };
 
@@ -77,10 +91,76 @@ elements.generateBtn.addEventListener('click', generateSubtitles);
 elements.downloadBtn.addEventListener('click', downloadSRT);
 elements.mediaPlayer.addEventListener('timeupdate', syncSubtitles);
 
+// Tab Switching
+elements.tabLocal.addEventListener('click', () => switchTab('local'));
+elements.tabYoutube.addEventListener('click', () => switchTab('youtube'));
+
+// YouTube
+elements.loadYtBtn.addEventListener('click', loadYoutubeVideo);
+
 // Mascot Drag
 setupDraggable(elements.mascot);
 
 // --- Functions ---
+function switchTab(mode) {
+    state.mode = mode;
+    if (mode === 'local') {
+        elements.tabLocal.classList.add('active');
+        elements.tabYoutube.classList.remove('active');
+        elements.contentLocal.classList.add('active');
+        elements.contentYoutube.classList.remove('active');
+
+        // Restore Local Player
+        if (state.file) {
+            // Re-attach video element if needed or just show standard player
+            elements.playerContainer.innerHTML = `
+                <video id="media-player" controls playsinline src="${elements.mediaPlayer ? elements.mediaPlayer.src : ''}">
+                    你的瀏覽器不支援影片播放。
+                </video>`;
+            elements.mediaPlayer = document.getElementById('media-player');
+            elements.mediaPlayer.addEventListener('timeupdate', syncSubtitles);
+            elements.generateBtn.disabled = !state.file;
+        } else {
+            elements.playerContainer.innerHTML = `<video id="media-player" controls playsinline>你的瀏覽器不支援影片播放。</video>`;
+            elements.mediaPlayer = document.getElementById('media-player');
+        }
+    } else {
+        elements.tabLocal.classList.remove('active');
+        elements.tabYoutube.classList.add('active');
+        elements.contentLocal.classList.remove('active');
+        elements.contentYoutube.classList.add('active');
+
+        elements.generateBtn.disabled = !state.youtubeId;
+    }
+}
+
+function loadYoutubeVideo() {
+    const url = elements.ytInput.value.trim();
+    if (!url) return;
+
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+
+    if (match && match[2].length === 11) {
+        state.youtubeId = match[2];
+        elements.playerContainer.innerHTML = `
+            <iframe id="yt-player" 
+                src="https://www.youtube.com/embed/${state.youtubeId}?enablejsapi=1" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen>
+            </iframe>
+        `;
+        elements.statusMsg.innerText = "YOUTUBE SIGNAL ACQUIRED";
+        elements.generateBtn.disabled = false;
+
+        // Note: For extensive sync, we'd need the YT Player API to track time, 
+        // but for this UI demo, embedding is the first step.
+    } else {
+        alert("Invalid YouTube URL");
+        elements.statusMsg.innerText = "SIGNAL ERROR";
+    }
+}
 
 function handleFileUpload(e) {
     const file = e.target.files[0];
@@ -90,7 +170,8 @@ function handleFileUpload(e) {
     const url = URL.createObjectURL(file);
     elements.mediaPlayer.src = url;
     elements.generateBtn.disabled = false;
-    elements.fileNameDisplay.innerText = `目前檔案: ${file.name}`;
+    elements.fileNameDisplay.style.display = 'flex';
+    elements.fileNameText.innerText = file.name;
     elements.statusMsg.innerText = "已載入";
 }
 
@@ -99,8 +180,18 @@ async function generateSubtitles() {
         alert("請輸入 Gemini API Key");
         return;
     }
-    if (!state.file) {
-        alert("請選擇檔案");
+    if (!state.file && state.mode === 'local') {
+        alert("Please select a file.");
+        return;
+    }
+    if (!state.youtubeId && state.mode === 'youtube') {
+        alert("Please load a YouTube video.");
+        return;
+    }
+
+    // Check if YouTube mode - Mocking or Alerting Limitation
+    if (state.mode === 'youtube') {
+        alert("⚠️ SYSTEM NOTICE: Client-side YouTube generation is currently restricted by browser security (CORS) and lack of direct audio access. \n\nIn a full production node, this would connect to a backend server to extract audio. For now, please use Local File mode.");
         return;
     }
 
