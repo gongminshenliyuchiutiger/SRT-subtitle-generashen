@@ -105,7 +105,7 @@ async function generateSubtitles() {
     setLoading(true);
     try {
         const genAI = new GoogleGenerativeAI(state.apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
         // Read file as Base64 (Client-side limit applies)
         // Note: For large files, this might crash browser. Ideally, we use the File API manager, 
