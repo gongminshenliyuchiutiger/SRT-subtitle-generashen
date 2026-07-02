@@ -16,19 +16,24 @@ const elements = {
     // Tutorial Modal Elements
     helpBtn: document.getElementById('help-btn'),
     modal: document.getElementById('tutorial-modal'),
-    closeModal: document.querySelector('.close-modal')
+    closeModal: document.querySelector('.close-modal'),
+    apiModelSelect: document.getElementById('api-model')
 };
 
 // State
 let state = {
     subtitles: [], // { id, start, end, text }
     file: null,
-    apiKey: localStorage.getItem('gemini_api_key') || ''
+    apiKey: localStorage.getItem('gemini_api_key') || '',
+    apiModel: localStorage.getItem('gemini_api_model') || 'gemini-2.5-flash'
 };
 
 // Initialize
 if (state.apiKey) {
     elements.apiKeyInput.value = state.apiKey;
+}
+if (state.apiModel) {
+    elements.apiModelSelect.value = state.apiModel;
 }
 
 // --- Event Listeners ---
@@ -70,6 +75,12 @@ elements.apiKeyInput.addEventListener('input', (e) => {
     localStorage.setItem('gemini_api_key', state.apiKey);
 });
 
+// API Model Save
+elements.apiModelSelect.addEventListener('change', (e) => {
+    state.apiModel = e.target.value;
+    localStorage.setItem('gemini_api_model', state.apiModel);
+});
+
 // File Upload
 elements.fileInput.addEventListener('change', handleFileUpload);
 elements.generateBtn.addEventListener('click', generateSubtitles);
@@ -105,7 +116,8 @@ async function generateSubtitles() {
     setLoading(true);
     try {
         const genAI = new GoogleGenerativeAI(state.apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const modelToUse = state.apiModel || "gemini-2.5-flash";
+        const model = genAI.getGenerativeModel({ model: modelToUse });
 
         // Read file as Base64 (Client-side limit applies)
         // Note: For large files, this might crash browser. Ideally, we use the File API manager, 

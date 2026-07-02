@@ -80,6 +80,29 @@ input[type="text"] {
   font-size: 1rem;
 }
 
+#api-model {
+  padding: 0.8rem 1.2rem;
+  border-radius: 8px;
+  border: 1px solid var(--glass-border);
+  background: rgba(0, 0, 0, 0.3);
+  color: white;
+  min-width: 300px;
+  font-size: 1rem;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#api-model:focus {
+  border-color: var(--primary-glow);
+  box-shadow: 0 0 10px rgba(0, 242, 234, 0.4);
+}
+
+#api-model option {
+  background-color: #1a1a2e;
+  color: white;
+}
+
 button {
   padding: 0.8rem 1.5rem;
   border-radius: 8px;
