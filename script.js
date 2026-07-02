@@ -17,7 +17,8 @@ const elements = {
     helpBtn: document.getElementById('help-btn'),
     modal: document.getElementById('tutorial-modal'),
     closeModal: document.querySelector('.close-modal'),
-    apiModelSelect: document.getElementById('api-model')
+    apiModelSelect: document.getElementById('api-model'),
+    subtitleOverlay: document.getElementById('subtitle-overlay')
 };
 
 // State
@@ -253,6 +254,17 @@ function syncSubtitles() {
             el.classList.add('active');
             // Smooth scroll to element
             el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // Show subtitle overlay on video
+        if (elements.subtitleOverlay) {
+            elements.subtitleOverlay.innerText = state.subtitles[activeIdx].text;
+            elements.subtitleOverlay.style.display = 'block';
+        }
+    } else {
+        // Hide subtitle overlay
+        if (elements.subtitleOverlay) {
+            elements.subtitleOverlay.style.display = 'none';
         }
     }
 }
